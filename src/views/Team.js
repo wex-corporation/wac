@@ -18,6 +18,7 @@ export default class TeamView {
                 </section>
 
                 <section class="section">
+<<<<<<< HEAD
                     <div class="container">
                         <div class="grid-2">
                             <!-- Team Member 1 -->
@@ -56,6 +57,29 @@ export default class TeamView {
                                     <strong class="text-primary">Languages:</strong>
                                     <p class="text-secondary">Korean, English</p>
                                 </div>
+=======
+                    <div class="container" style="max-width: 800px;">
+                        <!-- Principal Profile -->
+                        <div class="card team-card">
+                            <h3 class="mb-1" data-i18n="team_name">LEE JI SOO</h3>
+                            <p class="text-accent mb-4" data-i18n="team_title">Managing Director</p>
+                            
+                            <div class="mb-3">
+                                <strong class="text-primary" data-i18n="team_cred_label">Credentials:</strong>
+                                <p class="text-secondary" data-i18n="team_cred_text">Korea Certified Appraiser (KCA), Member of RICS (MRICS)</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong class="text-primary" data-i18n="team_exp_label">Experience:</strong>
+                                <p class="text-secondary" data-i18n="team_exp_text">$500B+ Valuation and Advisory Services</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong class="text-primary" data-i18n="team_clients_label">Key Clients:</strong>
+                                <p class="text-secondary" data-i18n="team_clients_text">Global Institutional Investors, Sovereign Wealth Funds, High-Net-Worth Individuals, Commercial Banks, Conglomerates</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong class="text-primary" data-i18n="team_lang_label">Languages:</strong>
+                                <p class="text-secondary" data-i18n="team_lang_text">Korean, English</p>
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
                             </div>
                         </div>
                     </div>

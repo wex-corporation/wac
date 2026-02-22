@@ -57,10 +57,39 @@ export const translations = {
         about_title: "About the Firm",
         about_copy: "W Appraisal Company is a cross-border real estate valuation and advisory firm serving institutional investors, financial institutions, REITs, funds, and high-net-worth clients. We deliver defensible valuation, audit-ready documentation, and globally aligned standards with local market intelligence.",
 
+<<<<<<< HEAD
+=======
+        // Team View
+        team_main_title: "Our Leadership",
+        team_name: "LEE JI SOO",
+        team_title: "Managing Director",
+        team_cred_label: "Credentials:",
+        team_cred_text: "Korea Certified Appraiser (KCA), Member of RICS (MRICS)",
+        team_exp_label: "Experience:",
+        team_exp_text: "$500B+ Valuation and Advisory Services",
+        team_clients_label: "Key Clients:",
+        team_clients_text: "Global Institutional Investors, Sovereign Wealth Funds, High-Net-Worth Individuals, Commercial Banks, Conglomerates",
+        team_lang_label: "Languages:",
+        team_lang_text: "Korean, English",
+
+        // Privacy Policy
+        privacy_title: "Privacy Policy",
+        privacy_last_updated: "Last Updated: October 2023",
+        privacy_h1: "1. Information We Collect",
+        privacy_p1: "We collect information you provide directly to us, such as when you request a proposal, submit a form for a desktop appraisal, or communicate with us. This may include your name, email address, property details, and other contact information.",
+        privacy_h2: "2. How We Use Information",
+        privacy_p2: "We use the information we collect to provide, maintain, and improve our services, communicate with you, process transactions, and for compliance with legal obligations.",
+        privacy_h3: "3. Information Sharing",
+        privacy_p3: "We do not share your personal information with third parties except as necessary to provide our services, comply with the law, or protect our rights. All client data and property information is kept strictly confidential in accordance with our professional standards.",
+        privacy_h4: "4. Contact Us",
+        privacy_p4: "If you have any questions about this Privacy Policy, please contact us at info@wappraisal.com.",
+
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
         // Desktop Appraisal
         da_title: "Desktop Appraisal Request",
         da_subtitle: "Provide basic property details for a quick desktop valuation.",
         da_form_info: "Property & Contact Information",
+<<<<<<< HEAD
         da_address: "Property Address *",
         da_type: "Property Type *",
         da_type_select: "Select type...",
@@ -69,6 +98,10 @@ export const translations = {
         da_land: "Land",
         da_industrial: "Industrial",
         da_area: "Estimated Area (sqm) *",
+=======
+        da_address: "Target Property Address *",
+        da_due_date: "Date Needed By *",
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
         da_name: "Name *",
         da_email: "Email *",
         da_payment_title: "Payment Required",
@@ -135,10 +168,39 @@ export const translations = {
         about_title: "회사 소개",
         about_copy: "W Appraisal Company는 기관 투자자, 금융 기관, 리츠(REITs), 펀드 및 고액 자산가를 대상으로 서비스를 제공하는 크로스보더 부동산 가치평가 및 자문 회사입니다. 우리는 방어 가능한 가치평가, 감사 가능한 문서화, 현지 시장 정보와 결합된 글로벌 기준을 제공합니다.",
 
+<<<<<<< HEAD
+=======
+        // Team View
+        team_main_title: "핵심 리더십",
+        team_name: "이지수 (LEE JI SOO)",
+        team_title: "대표 감정평가사",
+        team_cred_label: "자격:",
+        team_cred_text: "한국 감정평가사 전문자격 (KCA), 영국왕립자산평가사 (MRICS)",
+        team_exp_label: "경력:",
+        team_exp_text: "누적 5,000억 달러($500B) 이상의 가치평가 및 자문 역량 확보",
+        team_clients_label: "주요 클라이언트:",
+        team_clients_text: "글로벌 기관투자자, 정부 기관, 개인 자산가, 상업 은행, 대기업",
+        team_lang_label: "사용 언어:",
+        team_lang_text: "한국어, 영어",
+
+        // Privacy Policy
+        privacy_title: "개인정보 처리방침",
+        privacy_last_updated: "최종 업데이트: 2023년 10월",
+        privacy_h1: "1. 수집하는 정보",
+        privacy_p1: "당사는 제안서 요청, 탁상 감정평가 양식 제출 또는 당사와의 커뮤니케이션 등 귀하가 직접 제공하는 정보를 수집합니다. 여기에는 귀하의 이름, 이메일 주소, 부동산 세부 정보 및 기타 연락처 정보가 포함될 수 있습니다.",
+        privacy_h2: "2. 정보 사용 방법",
+        privacy_p2: "당사는 수집한 정보를 서비스 제공, 유지 관리 및 개선, 귀하와의 커뮤니케이션, 거래 처리 및 법적 의무 준수를 위해 사용합니다.",
+        privacy_h3: "3. 정보 공유",
+        privacy_p3: "당사는 서비스 제공, 법률 준수 또는 당사의 권리 보호를 위해 필요한 경우를 제외하고 귀하의 개인 정보를 제3자와 공유하지 않습니다. 모든 고객 데이터 및 부동산 정보는 당사의 전문적인 기준에 따라 엄격하게 기밀로 유지됩니다.",
+        privacy_h4: "4. 문의하기",
+        privacy_p4: "본 개인정보 처리방침에 대해 질문이 있는 경우 info@wappraisal.com 으로 문의해 주십시오.",
+
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
         // Desktop Appraisal
         da_title: "탁상 감정평가 요청",
         da_subtitle: "신속한 탁상 감정을 위해 기본적인 물건 정보를 기입해 주세요.",
         da_form_info: "물건 및 연락처 정보",
+<<<<<<< HEAD
         da_address: "물건 주소 *",
         da_type: "물건 유형 *",
         da_type_select: "유형 선택...",
@@ -147,6 +209,10 @@ export const translations = {
         da_land: "토지",
         da_industrial: "산업용",
         da_area: "예상 면적 (sqm) *",
+=======
+        da_address: "평가대상 부동산 주소 *",
+        da_due_date: "언제까지 필요한지 (필요 기한) *",
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
         da_name: "이름 *",
         da_email: "이메일 *",
         da_payment_title: "결제 필요",

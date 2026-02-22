@@ -20,6 +20,7 @@ export default class DesktopAppraisalView {
                             <form id="desktopForm" class="contact-form">
                                 <h3 class="mb-4 text-primary" data-i18n="da_form_info">Property & Contact Information</h3>
                                 
+<<<<<<< HEAD
                                 <div class="form-group mb-3">
                                     <label for="da_address" data-i18n="da_address">Property Address *</label>
                                     <input type="text" id="da_address" required class="form-control" placeholder="">
@@ -44,6 +45,10 @@ export default class DesktopAppraisalView {
 
                                 <div class="grid-2 mb-4">
                                     <div class="form-group">
+=======
+                                <div class="grid-2 mb-3">
+                                    <div class="form-group">
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
                                         <label for="da_name" data-i18n="da_name">Name *</label>
                                         <input type="text" id="da_name" required class="form-control">
                                     </div>
@@ -53,6 +58,19 @@ export default class DesktopAppraisalView {
                                     </div>
                                 </div>
                                 
+<<<<<<< HEAD
+=======
+                                <div class="form-group mb-3">
+                                    <label for="da_address" data-i18n="da_address">Target Property Address *</label>
+                                    <input type="text" id="da_address" required class="form-control" placeholder="">
+                                </div>
+                                
+                                <div class="form-group mb-4">
+                                    <label for="da_due_date" data-i18n="da_due_date">Date Needed By *</label>
+                                    <input type="date" id="da_due_date" required class="form-control" placeholder="">
+                                </div>
+                                
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
                                 <div class="form-group mb-4 p-4 text-center" style="background: rgba(34,211,238,0.05); border-radius: 8px; border: 1px solid var(--border-color);">
                                     <h4 class="mb-2" data-i18n="da_payment_title">Payment Required</h4>
                                     <h2 class="text-accent mb-3">$1.00 USD</h2>

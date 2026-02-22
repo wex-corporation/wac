@@ -7,6 +7,10 @@ import ContactView from './views/Contact.js';
 import CaseStudiesView from './views/CaseStudies.js';
 import InsightsView from './views/Insights.js';
 import DesktopAppraisalView from './views/DesktopAppraisal.js';
+<<<<<<< HEAD
+=======
+import PrivacyView from './views/Privacy.js';
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
 
 const routes = {
     '/': HomeView,
@@ -19,6 +23,10 @@ const routes = {
     '/insights': InsightsView,
     '/team': TeamView,
     '/contact': ContactView,
+<<<<<<< HEAD
+=======
+    '/privacy': PrivacyView,
+>>>>>>> c30f7c1 (Initial commit for W Appraisal Company website)
     // Add other routes as needed
 };
 
