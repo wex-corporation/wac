@@ -447,6 +447,72 @@ export default class DesktopAppraisalView {
                         grid-template-columns: 1fr;
                     }
                 }
+                @media (max-width: 768px) {
+                    .view-desktop-appraisal .page-header {
+                        padding-bottom: 2rem !important;
+                    }
+                    .purchase-badge {
+                        width: 100%;
+                        justify-content: center;
+                        text-align: center;
+                        line-height: 1.45;
+                    }
+                    .hero-fact {
+                        padding: 1.15rem;
+                    }
+                    .notice-links,
+                    .notice-links .btn {
+                        width: 100%;
+                    }
+                    .notice-links {
+                        flex-direction: column;
+                    }
+                    .order-summary-card,
+                    .contact-form-card {
+                        border-radius: 24px;
+                    }
+                    .guest-checkout-note,
+                    .agreement-box,
+                    .price-box {
+                        border-radius: 18px;
+                    }
+                    .agreement-item {
+                        gap: 0.6rem;
+                        font-size: 0.88rem;
+                    }
+                    .agreement-item input {
+                        flex: 0 0 auto;
+                    }
+                    .form-control {
+                        font-size: 16px;
+                        padding: 0.9rem 0.95rem;
+                    }
+                    .submit-btn {
+                        font-size: 1rem;
+                    }
+                    .text-center .btn {
+                        width: 100%;
+                    }
+                }
+                @media (max-width: 560px) {
+                    .hero-facts {
+                        gap: 0.75rem;
+                    }
+                    .hero-fact span,
+                    .order-summary-row strong {
+                        font-size: 0.98rem;
+                    }
+                    .order-summary-row {
+                        padding: 0.8rem 0;
+                    }
+                    .guest-checkout-note p,
+                    .agreement-item {
+                        line-height: 1.5;
+                    }
+                    .form-group label {
+                        font-size: 0.86rem;
+                    }
+                }
             </style>
         `;
     }

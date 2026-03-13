@@ -337,12 +337,15 @@ export default class HomeView {
 
             <style>
                 .home-hero {
+                    position: relative;
+                    isolation: isolate;
+                    overflow: hidden;
                     padding-top: clamp(56px, 8vw, 88px);
+                    padding-bottom: 2rem;
                 }
                 .hero-media {
                     position: absolute;
-                    inset: 0 0 auto 0;
-                    height: min(900px, 92vh);
+                    inset: 0;
                     background:
                         linear-gradient(180deg, rgba(5, 8, 20, 0.12), rgba(5, 8, 20, 0.82)),
                         linear-gradient(90deg, rgba(5, 8, 20, 0.84), rgba(5, 8, 20, 0.22) 48%, rgba(5, 8, 20, 0.72)),
@@ -354,14 +357,18 @@ export default class HomeView {
                 .hero-grid {
                     position: relative;
                     z-index: 1;
-                    min-height: 74vh;
+                    min-height: clamp(640px, 78vh, 860px);
                     display: grid;
                     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.72fr);
                     gap: 1.75rem;
-                    align-items: end;
+                    align-items: center;
+                    padding: clamp(1.5rem, 3vw, 2.5rem) 0 0;
                 }
                 .hero-copy {
-                    padding: clamp(2rem, 4vw, 4rem) 0 1rem;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    padding: 0;
                 }
                 .hero-headline {
                     max-width: 10ch;
@@ -374,8 +381,24 @@ export default class HomeView {
                     gap: 0.85rem;
                     flex-wrap: wrap;
                 }
+                .hero-copy .pill-row {
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 0.75rem;
+                    max-width: 720px;
+                    width: 100%;
+                }
+                .hero-copy .pill {
+                    justify-content: center;
+                    min-height: 54px;
+                    text-align: center;
+                    line-height: 1.35;
+                    padding: 0.85rem 0.95rem;
+                }
                 .hero-panel {
-                    margin-bottom: 1rem;
+                    width: min(100%, 500px);
+                    margin: 0 0 0 auto;
+                    align-self: center;
                 }
                 .hero-panel-list {
                     display: grid;
@@ -419,7 +442,7 @@ export default class HomeView {
                 .hero-strip {
                     position: relative;
                     z-index: 1;
-                    margin-top: 1.4rem;
+                    margin-top: 1rem;
                     display: flex;
                     justify-content: space-between;
                     gap: 1rem;
@@ -614,12 +637,16 @@ export default class HomeView {
                         max-width: 12ch;
                     }
                     .hero-panel {
-                        max-width: 680px;
+                        width: min(100%, 680px);
+                        margin-left: 0;
                     }
                 }
                 @media (max-width: 900px) {
                     .logo-cloud {
                         grid-template-columns: repeat(4, minmax(0, 1fr));
+                    }
+                    .update-card {
+                        min-height: 220px;
                     }
                     .metrics-grid,
                     .cta-cards,
@@ -630,10 +657,25 @@ export default class HomeView {
                         flex-direction: column;
                         align-items: flex-start;
                     }
+                    .hero-copy .pill-row {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
                 }
                 @media (max-width: 768px) {
-                    .hero-media {
-                        height: 84vh;
+                    .hero-grid {
+                        min-height: auto;
+                        gap: 1rem;
+                        padding-top: 0.75rem;
+                    }
+                    .hero-copy {
+                        padding: 1.5rem 0 0;
+                    }
+                    .hero-headline,
+                    .hero-subcopy {
+                        max-width: none;
+                    }
+                    .hero-panel {
+                        margin-bottom: 0;
                     }
                     .hero-actions {
                         flex-direction: column;
@@ -645,8 +687,85 @@ export default class HomeView {
                     .logo-cloud {
                         grid-template-columns: repeat(2, minmax(0, 1fr));
                     }
+                    .logo-cloud span {
+                        min-height: 50px;
+                        font-size: 0.72rem;
+                        letter-spacing: 0.05em;
+                    }
+                    .section-header-row {
+                        align-items: start;
+                    }
+                    .hero-strip-links {
+                        width: 100%;
+                        flex-direction: column;
+                        align-items: stretch;
+                    }
+                    .hero-strip-links .link-arrow {
+                        justify-content: space-between;
+                    }
+                    .hero-copy .pill-row {
+                        grid-template-columns: 1fr;
+                        max-width: none;
+                    }
+                    .hero-copy .pill {
+                        min-height: 48px;
+                    }
+                    .metric-card {
+                        padding: 1.4rem;
+                    }
+                    .system-tile {
+                        min-height: 132px;
+                    }
+                    .cta-stage {
+                        padding: 1.1rem;
+                        border-radius: 24px;
+                    }
                     .ecosystem-stack {
                         justify-items: start;
+                    }
+                }
+                @media (max-width: 560px) {
+                    .home-hero {
+                        padding-top: 1.25rem;
+                        padding-bottom: 1rem;
+                    }
+                    .hero-headline {
+                        max-width: none;
+                    }
+                    .hero-module {
+                        grid-template-columns: 36px 1fr;
+                        gap: 0.75rem;
+                        padding: 0.9rem;
+                    }
+                    .hero-module-label {
+                        width: 36px;
+                        height: 36px;
+                        font-size: 0.72rem;
+                    }
+                    .hero-strip {
+                        padding: 1rem;
+                    }
+                    .hero-copy .pill {
+                        font-size: 0.82rem;
+                        padding: 0.8rem 0.9rem;
+                    }
+                    .update-card {
+                        min-height: auto;
+                    }
+                    .metrics-grid {
+                        border-radius: 22px;
+                    }
+                    .metric-card {
+                        padding: 1.2rem;
+                    }
+                    .ecosystem-stack span {
+                        font-size: clamp(1.5rem, 10vw, 2.4rem);
+                    }
+                    .system-panel {
+                        gap: 1rem;
+                    }
+                    .cta-card {
+                        padding: 1rem;
                     }
                 }
             </style>
