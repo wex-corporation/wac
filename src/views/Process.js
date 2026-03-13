@@ -76,7 +76,7 @@ export default class ProcessView {
             
             <style>
                 .page-header {
-                    background: radial-gradient(circle at 10% 50%, rgba(34,211,238,0.03) 0%, transparent 60%);
+                    background: radial-gradient(circle at 10% 50%, rgba(186,162,255,0.08) 0%, transparent 60%);
                 }
                 .view-process ul { padding-left: 0; }
                 .view-process li { color: var(--text-secondary); }

@@ -425,7 +425,7 @@ export default class DesktopAppraisalView {
                     margin-top: 0.25rem;
                 }
                 .price-box {
-                    background: rgba(34,211,238,0.05);
+                    background: rgba(186,162,255,0.08);
                     border-radius: 12px;
                     border: 1px solid var(--border-color);
                 }

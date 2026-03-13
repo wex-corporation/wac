@@ -104,7 +104,7 @@ export default class RefundPolicyView {
 
             <style>
                 .view-refund-policy .page-header {
-                    background: radial-gradient(circle at 20% 20%, rgba(34,211,238,0.06), transparent 40%);
+                    background: radial-gradient(circle at 20% 20%, rgba(186,162,255,0.12), transparent 40%);
                 }
                 .policy-list {
                     padding-left: 0;

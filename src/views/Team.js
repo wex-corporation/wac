@@ -45,7 +45,7 @@ export default class TeamView {
 
             <style>
                 .page-header {
-                    background: radial-gradient(circle at 90% 50%, rgba(34,211,238,0.03) 0%, transparent 60%);
+                    background: radial-gradient(circle at 90% 50%, rgba(186,162,255,0.08) 0%, transparent 60%);
                 }
             </style>
         `;

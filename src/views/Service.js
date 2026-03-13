@@ -157,7 +157,7 @@ export default class ServiceView {
                         </div>
                         
                         <!-- CTA Section -->
-                        <div class="cta-section mt-5 text-center card" style="background: rgba(34,211,238,0.02); max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <div class="cta-section mt-5 text-center card" style="background: rgba(186,162,255,0.08); max-width: 800px; margin-left: auto; margin-right: auto;">
                             <h3 class="mb-3">Ready to Discuss Your Portfolio?</h3>
                             <div class="d-flex justify-content-center" style="gap: 1rem;">
                                 <a href="/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
@@ -170,7 +170,7 @@ export default class ServiceView {
             
             <style>
                 .page-header {
-                    background: radial-gradient(circle at 50% 10%, rgba(34,211,238,0.05) 0%, transparent 70%);
+                    background: radial-gradient(circle at 50% 10%, rgba(186,162,255,0.1) 0%, transparent 70%);
                 }
                 .check-list, .bullet-list {
                     padding-left: 0;

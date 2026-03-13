@@ -57,7 +57,7 @@ export default class CaseStudiesView {
                 .badge {
                     display: inline-block;
                     padding: 4px 10px;
-                    background: rgba(34,211,238,0.1);
+                    background: rgba(186,162,255,0.14);
                     color: var(--accent);
                     border-radius: 4px;
                     font-size: 0.75rem;
