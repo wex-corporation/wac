@@ -17,7 +17,7 @@ export default class HomeView {
                         </p>
                         <div class="hero-actions fade-in delay-3">
                             <a href="#/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
-                            <a href="#services" class="btn btn-secondary ml-3" data-i18n="btn_explore_services" style="margin-left: 1rem;">Explore Our Services</a>
+                            <a href="#/services/cross-border" data-link class="btn btn-secondary ml-3" data-i18n="btn_explore_services" style="margin-left: 1rem;">Explore Our Services</a>
                         </div>
                     </div>
                 </section>
@@ -143,7 +143,8 @@ export default class HomeView {
                 
                 .trust-strip {
                     background: rgba(255,255,255,0.02);
-                    border-y: 1px solid var(--border-color);
+                    border-top: 1px solid var(--border-color);
+                    border-bottom: 1px solid var(--border-color);
                     padding: 3rem 0;
                 }
                 .trust-badges {

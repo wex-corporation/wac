@@ -3,7 +3,7 @@ import { translations } from './i18n.js';
 
 class App {
     constructor() {
-        this.currentLang = 'en'; // default
+        this.currentLang = localStorage.getItem('wac-lang') || 'en';
         this.appEl = document.getElementById('app');
         this.langToggleBtn = document.getElementById('langToggle');
 
@@ -34,6 +34,7 @@ class App {
 
     toggleLanguage() {
         this.currentLang = this.currentLang === 'en' ? 'kr' : 'en';
+        localStorage.setItem('wac-lang', this.currentLang);
         this.updateLangBodyClass();
         this.updateLangBtnState();
         this.applyTranslations();
@@ -61,7 +62,7 @@ class App {
         elements.forEach(el => {
             const key = el.getAttribute('data-i18n');
             const translation = this.getTranslation(key);
-            if (translation) {
+            if (translation !== null) {
                 if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                     if (el.hasAttribute('placeholder')) {
                         el.placeholder = translation;
@@ -83,21 +84,28 @@ class App {
         if (translations[this.currentLang] && translations[this.currentLang][key]) {
             return translations[this.currentLang][key];
         }
-        return translations['en'][key] || key;
+        return translations.en[key] ?? null;
     }
 
     updateActiveNav() {
         const links = document.querySelectorAll('.nav-links a');
         const currentPath = window.location.hash || '#/';
+        const serviceTrigger = document.querySelector('.dropdown-trigger');
+
+        if (serviceTrigger) {
+            serviceTrigger.classList.remove('active');
+        }
 
         links.forEach(link => {
             link.classList.remove('active');
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
-            } else if (currentPath.startsWith('#/services') && link.closest('.dropdown-trigger') && link.getAttribute('href').startsWith('#/services')) {
-                link.closest('.dropdown').querySelector('.dropdown-trigger').classList.add('active');
             }
         });
+
+        if (currentPath.startsWith('#/services') && serviceTrigger) {
+            serviceTrigger.classList.add('active');
+        }
     }
 }
 
