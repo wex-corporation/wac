@@ -160,8 +160,8 @@ export default class ServiceView {
                         <div class="cta-section mt-5 text-center card" style="background: rgba(34,211,238,0.02); max-width: 800px; margin-left: auto; margin-right: auto;">
                             <h3 class="mb-3">Ready to Discuss Your Portfolio?</h3>
                             <div class="d-flex justify-content-center" style="gap: 1rem;">
-                                <a href="#/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
-                                <a href="#/team" data-link class="btn btn-secondary">Speak With Our Team</a>
+                                <a href="/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
+                                <a href="/team" data-link class="btn btn-secondary">Speak With Our Team</a>
                             </div>
                         </div>
                     </div>

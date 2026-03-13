@@ -7,6 +7,7 @@ import CaseStudiesView from './views/CaseStudies.js';
 import InsightsView from './views/Insights.js';
 import DesktopAppraisalView from './views/DesktopAppraisal.js';
 import PrivacyView from './views/Privacy.js';
+import RefundPolicyView from './views/RefundPolicy.js';
 import TermsView from './views/Terms.js';
 import AccessibilityView from './views/Accessibility.js';
 
@@ -22,6 +23,7 @@ const routes = {
     '/team': TeamView,
     '/contact': ContactView,
     '/privacy': PrivacyView,
+    '/refund-policy': RefundPolicyView,
     '/terms': TermsView,
     '/accessibility': AccessibilityView
 };
@@ -31,10 +33,22 @@ class Router {
         this.appEl = null;
     }
 
+    getCurrentPath() {
+        const hashPath = window.location.hash.startsWith('#/') ? window.location.hash.slice(1) : '';
+        let path = window.location.pathname || '/';
+
+        if ((path === '/' || path === '') && hashPath) {
+            path = hashPath;
+            window.history.replaceState(null, '', path);
+        }
+
+        return path.length > 1 ? path.replace(/\/+$/, '') : path;
+    }
+
     init(appEl) {
         this.appEl = appEl;
 
-        window.addEventListener('hashchange', () => {
+        window.addEventListener('popstate', () => {
             this.router();
         });
 
@@ -46,21 +60,27 @@ class Router {
 
             event.preventDefault();
             const url = target.getAttribute('href');
-            window.location.hash = url.replace(/^#/, '');
+            const nextPath = url || '/';
+
+            if (nextPath !== window.location.pathname) {
+                window.history.pushState(null, '', nextPath);
+            }
+
+            this.router();
         });
 
         this.router();
     }
 
     async router() {
-        let path = window.location.hash.slice(1) || '/';
+        let path = this.getCurrentPath() || '/';
         let View = routes[path];
 
         if (!View) {
             console.warn(`Route ${path} not found, defaulting to home`);
             path = '/';
             View = routes[path];
-            window.history.replaceState(null, '', '#/');
+            window.history.replaceState(null, '', '/');
         }
 
         const viewInstance = typeof View.prototype?.render === 'function' ? new View() : View();

@@ -16,8 +16,8 @@ export default class HomeView {
                             Global standards context. Transparent methodology. Independent analysis. Delivered in Korean and English.
                         </p>
                         <div class="hero-actions fade-in delay-3">
-                            <a href="#/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
-                            <a href="#/services/cross-border" data-link class="btn btn-secondary ml-3" data-i18n="btn_explore_services" style="margin-left: 1rem;">Explore Our Services</a>
+                            <a href="/contact" data-link class="btn btn-primary" data-i18n="btn_req_proposal">Request a Proposal</a>
+                            <a href="/services/cross-border" data-link class="btn btn-secondary ml-3" data-i18n="btn_explore_services" style="margin-left: 1rem;">Explore Our Services</a>
                         </div>
                     </div>
                 </section>
@@ -53,7 +53,7 @@ export default class HomeView {
                             <div class="card service-card">
                                 <h3 data-i18n="nav_service_1">Cross-border Valuation & Advisory</h3>
                                 <p class="text-secondary mb-4" data-i18n="srv_1_desc">International coordination with local nuance and global documentation standards.</p>
-                                <a href="#/services/cross-border" data-link class="text-accent link-arrow">
+                                <a href="/services/cross-border" data-link class="text-accent link-arrow">
                                     <span data-i18n="btn_learn_more">Learn More</span> &rarr;
                                 </a>
                             </div>
@@ -61,7 +61,7 @@ export default class HomeView {
                             <div class="card service-card">
                                 <h3 data-i18n="nav_service_2">Lending & Financial Reporting</h3>
                                 <p class="text-secondary mb-4" data-i18n="srv_2_desc">Fair value context, audit-ready documentation, and consistency of assumptions.</p>
-                                <a href="#/services/financial-reporting" data-link class="text-accent link-arrow">
+                                <a href="/services/financial-reporting" data-link class="text-accent link-arrow">
                                     <span data-i18n="btn_learn_more">Learn More</span> &rarr;
                                 </a>
                             </div>
@@ -69,7 +69,7 @@ export default class HomeView {
                             <div class="card service-card">
                                 <h3 data-i18n="nav_service_3">Appraisal Review & Dispute Support</h3>
                                 <p class="text-secondary mb-4" data-i18n="srv_3_desc">Independent second opinion, assumption review, and risk clarification.</p>
-                                <a href="#/services/dispute-support" data-link class="text-accent link-arrow">
+                                <a href="/services/dispute-support" data-link class="text-accent link-arrow">
                                     <span data-i18n="btn_learn_more">Learn More</span> &rarr;
                                 </a>
                             </div>

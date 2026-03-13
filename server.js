@@ -41,6 +41,17 @@ const server = createServer(async (request, response) => {
         response.writeHead(200, { 'Content-Type': mimeType });
         response.end(body);
     } catch {
+        if (!extname(filePath)) {
+            try {
+                const indexBody = await readFile(join(rootDir, 'index.html'));
+                response.writeHead(200, { 'Content-Type': mimeTypes['.html'] });
+                response.end(indexBody);
+                return;
+            } catch {
+                // Fall through to 404 below.
+            }
+        }
+
         response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         response.end('Not Found');
     }

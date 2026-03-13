@@ -69,7 +69,7 @@ export default class ContactView {
                                 
                                 <div class="form-group mb-4">
                                     <p class="text-secondary" style="font-size: 0.85rem;">
-                                        By submitting this form, you agree to our <a href="#/privacy" data-link class="text-accent">Privacy Policy</a>. All information shared is kept strictly confidential.
+                                        By submitting this form, you agree to our <a href="/privacy" data-link class="text-accent">Privacy Policy</a>. All information shared is kept strictly confidential.
                                     </p>
                                 </div>
                                 

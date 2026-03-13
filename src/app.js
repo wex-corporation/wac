@@ -89,7 +89,7 @@ class App {
 
     updateActiveNav() {
         const links = document.querySelectorAll('.nav-links a');
-        const currentPath = window.location.hash || '#/';
+        const currentPath = window.location.pathname || '/';
         const serviceTrigger = document.querySelector('.dropdown-trigger');
 
         if (serviceTrigger) {
@@ -103,7 +103,7 @@ class App {
             }
         });
 
-        if (currentPath.startsWith('#/services') && serviceTrigger) {
+        if (currentPath.startsWith('/services') && serviceTrigger) {
             serviceTrigger.classList.add('active');
         }
     }

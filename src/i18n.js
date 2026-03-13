@@ -5,7 +5,7 @@ export const translations = {
         nav_service_1: 'Cross-border Valuation & Advisory',
         nav_service_2: 'Lending & Financial Reporting',
         nav_service_3: 'Appraisal Review & Dispute Support',
-        nav_desktop_appraisal: 'Desktop Appraisal ($1)',
+        nav_desktop_appraisal: 'Desktop Appraisal (KRW 1,000)',
         nav_process: 'Process & Standards',
         nav_cases: 'Case Studies',
         nav_insights: 'Insights',
@@ -14,6 +14,7 @@ export const translations = {
         footer_desc: 'Independent cross-border real estate valuation and advisory.',
         footer_legal: 'Legal',
         footer_privacy: 'Privacy Policy',
+        footer_refund_policy: 'Refund Policy',
         footer_terms: 'Terms of Service',
         footer_accessibility: 'Accessibility Statement',
         footer_contact: 'Contact',
@@ -98,11 +99,11 @@ export const translations = {
         da_name: 'Name *',
         da_email: 'Email *',
         da_payment_title: 'Payment Required',
-        da_payment_desc: 'Your desktop appraisal report will be delivered within 48 hours for a processing fee of $1.',
-        da_btn_pay: 'Pay $1 and Submit Request',
-        da_processing: 'Processing Payment...',
+        da_payment_desc: 'The one-time desktop appraisal fee is KRW 1,000, with delivery by email within 48 hours.',
+        da_btn_pay: 'Pay KRW 1,000 and Submit',
+        da_processing: 'Preparing secure payment...',
         da_success_title: 'Payment Successful & Request Received',
-        da_success_desc: 'Thank you. Your $1 payment was successful and we have received your desktop appraisal request. The report will be sent to your email shortly.'
+        da_success_desc: 'Thank you. Your KRW 1,000 payment was completed and your desktop appraisal request has been received. The report will be sent to your email shortly.'
     },
     kr: {
         nav_home: '홈',
@@ -110,7 +111,7 @@ export const translations = {
         nav_service_1: '크로스보더 가치평가 및 자문',
         nav_service_2: '대출 및 재무보고 목적 평가',
         nav_service_3: '감정평가 검토 및 분쟁 지원',
-        nav_desktop_appraisal: '탁상 감정평가 (1달러)',
+        nav_desktop_appraisal: '탁상 감정평가 (1,000원)',
         nav_process: '프로세스 및 기준',
         nav_cases: '사례 연구',
         nav_insights: '인사이트',
@@ -119,6 +120,7 @@ export const translations = {
         footer_desc: '독립적이고 전문적인 크로스보더 부동산 가치평가 및 자문 기관.',
         footer_legal: '법적 고지',
         footer_privacy: '개인정보 처리방침',
+        footer_refund_policy: '환불정책',
         footer_terms: '이용약관',
         footer_accessibility: '접근성 선언',
         footer_contact: '문의',
@@ -203,10 +205,10 @@ export const translations = {
         da_name: '이름 *',
         da_email: '이메일 *',
         da_payment_title: '결제 필요',
-        da_payment_desc: '탁상 감정평가 보고서는 1달러(USD)의 수수료 결제 후 48시간 이내에 제공됩니다.',
-        da_btn_pay: '1달러 결제 및 요청 제출',
-        da_processing: '결제를 처리하는 중입니다...',
+        da_payment_desc: '탁상 감정평가 1건당 결제 금액은 1,000원이며, 결제 완료 후 48시간 이내 이메일로 보고서가 제공됩니다.',
+        da_btn_pay: '1,000원 결제 및 요청 제출',
+        da_processing: '안전한 결제를 준비하고 있습니다...',
         da_success_title: '결제 완료 및 요청 접수',
-        da_success_desc: '감사합니다. 1달러 결제가 성공적으로 완료되었으며 탁상 감정평가 요청이 접수되었습니다. 보고서는 곧 이메일로 발송될 예정입니다.'
+        da_success_desc: '감사합니다. 1,000원 결제가 완료되었으며 탁상 감정평가 요청이 정상 접수되었습니다. 보고서는 곧 이메일로 발송될 예정입니다.'
     }
 };
