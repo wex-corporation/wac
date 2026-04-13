@@ -1,7 +1,36 @@
+import { ApiError, requestJson } from '../lib/api.js';
 import { formatKrw } from '../lib/tossPayments.js';
 
 function getMessage(enText, krText) {
     return window.appState?.currentLang === 'kr' ? krText : enText;
+}
+
+function getConfirmApiErrorMessage(error) {
+    const isProductionStaticHost = ['wappraisalcompany.com', 'www.wappraisalcompany.com'].includes(window.location.hostname);
+
+    if (error instanceof ApiError && error.code === 'NON_JSON_RESPONSE') {
+        return isProductionStaticHost
+            ? getMessage(
+                'The payment approval API is not attached on this static domain yet. The checkout server must be connected before payment approval can complete.',
+                '현재 이 정적 도메인에는 결제 승인 API가 연결되어 있지 않습니다. 결제 승인을 완료하려면 서버형 결제 API가 연결되어야 합니다.'
+            )
+            : getMessage(
+                'The payment approval API returned HTML instead of JSON. Please verify that the checkout server is running.',
+                '결제 승인 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 정상 실행 중인지 확인해 주세요.'
+            );
+    }
+
+    if (error instanceof ApiError && error.code === 'INVALID_JSON') {
+        return getMessage(
+            'The payment approval API returned malformed JSON. Please try again after the server response format is fixed.',
+            '결제 승인 API가 잘못된 JSON을 반환했습니다. 서버 응답 형식을 점검한 뒤 다시 시도해 주세요.'
+        );
+    }
+
+    return error?.message || getMessage(
+        'Payment approval could not be completed automatically.',
+        '결제 승인 처리를 자동으로 완료하지 못했습니다.'
+    );
 }
 
 export default class PaymentSuccessView {
@@ -165,7 +194,7 @@ export default class PaymentSuccessView {
         }
 
         try {
-            const response = await fetch('/api/payments/confirm', {
+            const result = await requestJson('/api/payments/confirm', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -176,12 +205,6 @@ export default class PaymentSuccessView {
                     amount
                 })
             });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'PAYMENT_CONFIRM_FAILED');
-            }
 
             const receiptUrl = result.payment?.receiptUrl;
             const approvedAt = result.payment?.approvedAt
@@ -247,7 +270,7 @@ export default class PaymentSuccessView {
                         'Payment approval could not be completed automatically. Please contact W Appraisal Company with your order ID if the issue persists.',
                         '결제 승인 처리를 자동으로 완료하지 못했습니다. 문제가 계속되면 주문번호와 함께 W Appraisal Company로 문의해 주세요.'
                     )}
-                    <div style="margin-top: 0.65rem; font-weight: 600;">${error.message}</div>
+                    <div style="margin-top: 0.65rem; font-weight: 600;">${getConfirmApiErrorMessage(error)}</div>
                 </div>
                 <div class="payment-result-actions">
                     <a href="/desktop-appraisal" data-link class="btn btn-primary">${getMessage('Try again', '다시 시도하기')}</a>

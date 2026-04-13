@@ -20,6 +20,33 @@ const mimeTypes = {
     '.svg': 'image/svg+xml; charset=utf-8'
 };
 
+function getCorsHeaders(request) {
+    const origin = request.headers.origin;
+
+    if (!origin) {
+        return {};
+    }
+
+    const allowedOrigins = new Set([
+        'http://127.0.0.1:4173',
+        'http://localhost:4173',
+        'https://wappraisalcompany.com',
+        'https://www.wappraisalcompany.com'
+    ]);
+
+    if (!allowedOrigins.has(origin)) {
+        return {};
+    }
+
+    return {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Accept',
+        'Access-Control-Max-Age': '86400',
+        Vary: 'Origin'
+    };
+}
+
 function getBaseUrl(request) {
     const origin = request.headers.origin;
 
@@ -37,8 +64,9 @@ function createOrderId() {
     return `WAC_${stamp}_${random}`;
 }
 
-function json(response, statusCode, payload) {
+function json(request, response, statusCode, payload) {
     response.writeHead(statusCode, {
+        ...getCorsHeaders(request),
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': 'no-store'
     });
@@ -176,7 +204,7 @@ async function handleCreateOrder(request, response) {
         const product = checkoutProducts.find(item => item.id === productId);
 
         if (!product) {
-            json(response, 400, { message: 'Unknown product.' });
+            json(request, response, 400, { message: 'Unknown product.' });
             return;
         }
 
@@ -189,7 +217,7 @@ async function handleCreateOrder(request, response) {
         const area = Number(payload.area);
 
         if (!propertyAddress || !propertyType || !dueDate || !customerName || !customerEmail || !reportUse || !Number.isFinite(area) || area <= 0) {
-            json(response, 400, { message: 'Required checkout fields are missing.' });
+            json(request, response, 400, { message: 'Required checkout fields are missing.' });
             return;
         }
 
@@ -218,7 +246,7 @@ async function handleCreateOrder(request, response) {
 
         await saveOrder(order);
 
-        json(response, 200, {
+        json(request, response, 200, {
             orderId: order.orderId,
             orderName: order.orderName,
             amount: order.amount,
@@ -230,7 +258,7 @@ async function handleCreateOrder(request, response) {
         });
     } catch (error) {
         console.error(error);
-        json(response, 500, { message: 'Failed to create checkout order.' });
+        json(request, response, 500, { message: 'Failed to create checkout order.' });
     }
 }
 
@@ -242,24 +270,24 @@ async function handleConfirmPayment(request, response) {
         const amount = Number(payload.amount);
 
         if (!paymentKey || !orderId || !Number.isFinite(amount)) {
-            json(response, 400, { message: 'Payment confirmation parameters are invalid.' });
+            json(request, response, 400, { message: 'Payment confirmation parameters are invalid.' });
             return;
         }
 
         const order = await getOrder(orderId);
 
         if (!order) {
-            json(response, 404, { message: 'Order not found.' });
+            json(request, response, 404, { message: 'Order not found.' });
             return;
         }
 
         if (order.amount !== amount) {
-            json(response, 400, { message: 'Amount does not match the prepared order.' });
+            json(request, response, 400, { message: 'Amount does not match the prepared order.' });
             return;
         }
 
         if (order.status === 'PAID' && order.paymentKey === paymentKey) {
-            json(response, 200, {
+            json(request, response, 200, {
                 ok: true,
                 alreadyConfirmed: true,
                 order: serializeOrder(order),
@@ -288,7 +316,7 @@ async function handleConfirmPayment(request, response) {
                 status: 'CONFIRM_FAILED',
                 lastError: tossResult
             });
-            json(response, tossResponse.status, {
+            json(request, response, tossResponse.status, {
                 message: tossResult.message || 'Payment approval failed.',
                 code: tossResult.code || 'TOSS_CONFIRM_FAILED'
             });
@@ -311,19 +339,25 @@ async function handleConfirmPayment(request, response) {
             }
         });
 
-        json(response, 200, {
+        json(request, response, 200, {
             ok: true,
             order: serializeOrder(updatedOrder),
             payment: updatedOrder.payment
         });
     } catch (error) {
         console.error(error);
-        json(response, 500, { message: 'Failed to confirm the TossPayments order.' });
+        json(request, response, 500, { message: 'Failed to confirm the TossPayments order.' });
     }
 }
 
 const server = createServer(async (request, response) => {
     const requestUrl = new URL(request.url || '/', `http://${request.headers.host || `127.0.0.1:${port}`}`);
+
+    if (request.method === 'OPTIONS' && requestUrl.pathname.startsWith('/api/')) {
+        response.writeHead(204, getCorsHeaders(request));
+        response.end();
+        return;
+    }
 
     if (request.method === 'POST' && requestUrl.pathname === '/api/orders') {
         await handleCreateOrder(request, response);

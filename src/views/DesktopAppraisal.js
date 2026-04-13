@@ -1,4 +1,5 @@
 import { checkoutProducts, checkoutUseCases, tossPublicConfig } from '../config/tossPayments.js';
+import { ApiError, requestJson } from '../lib/api.js';
 import { formatKrw, getGuestCustomerKey, loadTossPaymentsSdk } from '../lib/tossPayments.js';
 
 const product = checkoutProducts[0];
@@ -9,6 +10,34 @@ function renderList(items) {
 
 function getLocalizedText(enText, krText) {
     return window.appState?.currentLang === 'kr' ? krText : enText;
+}
+
+function getCheckoutApiErrorMessage(error) {
+    const isProductionStaticHost = ['wappraisalcompany.com', 'www.wappraisalcompany.com'].includes(window.location.hostname);
+
+    if (error instanceof ApiError && error.code === 'NON_JSON_RESPONSE') {
+        return isProductionStaticHost
+            ? getLocalizedText(
+                'This domain is currently serving a static deployment, so the checkout order API is not attached yet. The payment server needs to be connected before checkout can start.',
+                '현재 이 도메인은 정적 배포를 서빙하고 있어 결제 주문 API가 아직 연결되지 않았습니다. 결제를 시작하려면 서버형 결제 API가 연결되어야 합니다.'
+            )
+            : getLocalizedText(
+                'The checkout API returned HTML instead of JSON. Please verify that the payment server is running and the API URL is correct.',
+                '결제 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 실행 중인지와 API 주소가 맞는지 확인해 주세요.'
+            );
+    }
+
+    if (error instanceof ApiError && error.code === 'INVALID_JSON') {
+        return getLocalizedText(
+            'The checkout API returned malformed JSON. Please try again after the server response format is fixed.',
+            '결제 API가 잘못된 JSON을 반환했습니다. 서버 응답 형식을 점검한 뒤 다시 시도해 주세요.'
+        );
+    }
+
+    return error?.message || getLocalizedText(
+        'Checkout failed before payment approval.',
+        '결제 승인 전 단계에서 오류가 발생했습니다.'
+    );
 }
 
 export default class DesktopAppraisalView {
@@ -293,7 +322,7 @@ export default class DesktopAppraisalView {
 
                                         <div class="form-group mb-4 p-4 price-box">
                                             <div class="price-box-header">
-                                                <div>
+                                                <div class="price-box-copy">
                                                     <h4 class="mb-2" data-i18n="da_payment_title">Payment Required</h4>
                                                     <p class="text-secondary mb-0" data-i18n="da_payment_desc">
                                                         The one-time desktop appraisal fee is KRW 1,000, with delivery by email within 48 hours.
@@ -568,18 +597,31 @@ export default class DesktopAppraisalView {
                     background: rgba(186, 162, 255, 0.08);
                     border-radius: 12px;
                     border: 1px solid var(--border-color);
+                    padding: 1.25rem 1.35rem;
                 }
                 .price-box-header {
                     display: grid;
                     grid-template-columns: minmax(0, 1fr) auto;
-                    gap: 1rem;
-                    align-items: center;
+                    gap: 1.15rem;
+                    align-items: start;
+                }
+                .price-box-copy {
+                    display: grid;
+                    gap: 0.2rem;
+                }
+                .price-box-copy p {
+                    line-height: 1.7;
                 }
                 .price-box-amount {
                     font-size: 1.6rem;
                     font-weight: 800;
                     color: var(--accent);
                     white-space: nowrap;
+                    padding: 0.95rem 1rem;
+                    border-radius: 18px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    align-self: center;
                 }
                 .payment-widget-shell {
                     border: 1px solid var(--border-color);
@@ -838,19 +880,13 @@ export default class DesktopAppraisalView {
             };
 
             try {
-                const response = await fetch('/api/orders', {
+                const order = await requestJson('/api/orders', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
-
-                const order = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(order.message || 'ORDER_CREATE_FAILED');
-                }
 
                 sessionStorage.setItem('wac-last-order', JSON.stringify({
                     orderId: order.orderId,
@@ -877,15 +913,7 @@ export default class DesktopAppraisalView {
                 });
             } catch (error) {
                 setSubmitting(false);
-                setStatus('error', error.message === 'ORDER_CREATE_FAILED'
-                    ? getLocalizedText(
-                        'The order could not be created. Please review the form and try again.',
-                        '주문 정보를 생성하지 못했습니다. 입력 내용을 확인한 뒤 다시 시도해 주세요.'
-                    )
-                    : getLocalizedText(
-                        error.message || 'Checkout failed before payment approval.',
-                        `결제 승인 전 단계에서 오류가 발생했습니다. ${error.message || ''}`.trim()
-                    ));
+                setStatus('error', getCheckoutApiErrorMessage(error));
                 console.error(error);
             }
         });
