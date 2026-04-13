@@ -13,18 +13,18 @@ function getLocalizedText(enText, krText) {
 }
 
 function getCheckoutApiErrorMessage(error) {
-    const isProductionStaticHost = ['wappraisalcompany.com', 'www.wappraisalcompany.com'].includes(window.location.hostname);
+    if (error instanceof ApiError && error.code === 'NETWORK_ERROR') {
+        return getLocalizedText(
+            'The checkout API is temporarily unreachable. Please try again in a moment.',
+            '결제 API 서버에 일시적으로 연결되지 않습니다. 잠시 후 다시 시도해 주세요.'
+        );
+    }
 
     if (error instanceof ApiError && error.code === 'NON_JSON_RESPONSE') {
-        return isProductionStaticHost
-            ? getLocalizedText(
-                'This domain is currently serving a static deployment, so the checkout order API is not attached yet. The payment server needs to be connected before checkout can start.',
-                '현재 이 도메인은 정적 배포를 서빙하고 있어 결제 주문 API가 아직 연결되지 않았습니다. 결제를 시작하려면 서버형 결제 API가 연결되어야 합니다.'
-            )
-            : getLocalizedText(
-                'The checkout API returned HTML instead of JSON. Please verify that the payment server is running and the API URL is correct.',
-                '결제 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 실행 중인지와 API 주소가 맞는지 확인해 주세요.'
-            );
+        return getLocalizedText(
+            'The checkout API returned HTML instead of JSON. Please verify that the payment server is running and the API URL is correct.',
+            '결제 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 실행 중인지와 API 주소가 맞는지 확인해 주세요.'
+        );
     }
 
     if (error instanceof ApiError && error.code === 'INVALID_JSON') {

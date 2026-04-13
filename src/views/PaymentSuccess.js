@@ -6,18 +6,18 @@ function getMessage(enText, krText) {
 }
 
 function getConfirmApiErrorMessage(error) {
-    const isProductionStaticHost = ['wappraisalcompany.com', 'www.wappraisalcompany.com'].includes(window.location.hostname);
+    if (error instanceof ApiError && error.code === 'NETWORK_ERROR') {
+        return getMessage(
+            'The payment approval API is temporarily unreachable. Please retry the payment confirmation shortly.',
+            '결제 승인 API 서버에 일시적으로 연결되지 않습니다. 잠시 후 다시 승인 확인을 시도해 주세요.'
+        );
+    }
 
     if (error instanceof ApiError && error.code === 'NON_JSON_RESPONSE') {
-        return isProductionStaticHost
-            ? getMessage(
-                'The payment approval API is not attached on this static domain yet. The checkout server must be connected before payment approval can complete.',
-                '현재 이 정적 도메인에는 결제 승인 API가 연결되어 있지 않습니다. 결제 승인을 완료하려면 서버형 결제 API가 연결되어야 합니다.'
-            )
-            : getMessage(
-                'The payment approval API returned HTML instead of JSON. Please verify that the checkout server is running.',
-                '결제 승인 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 정상 실행 중인지 확인해 주세요.'
-            );
+        return getMessage(
+            'The payment approval API returned HTML instead of JSON. Please verify that the checkout server is running.',
+            '결제 승인 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 정상 실행 중인지 확인해 주세요.'
+        );
     }
 
     if (error instanceof ApiError && error.code === 'INVALID_JSON') {

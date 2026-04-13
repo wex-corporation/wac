@@ -6,6 +6,11 @@ class ApiError extends Error {
     }
 }
 
+const staticHostApiBaseUrls = {
+    'wappraisalcompany.com': 'https://7d3e2df443f3c3.lhr.life',
+    'www.wappraisalcompany.com': 'https://7d3e2df443f3c3.lhr.life'
+};
+
 function trimTrailingSlash(value) {
     return String(value || '').replace(/\/+$/, '');
 }
@@ -15,6 +20,12 @@ export function getApiBaseUrl() {
 
     if (configuredBaseUrl) {
         return configuredBaseUrl;
+    }
+
+    const staticHostBaseUrl = trimTrailingSlash(staticHostApiBaseUrls[window.location.hostname]);
+
+    if (staticHostBaseUrl) {
+        return staticHostBaseUrl;
     }
 
     return trimTrailingSlash(window.location.origin);
@@ -33,10 +44,20 @@ export async function requestJson(path, options = {}) {
         headers.set('Accept', 'application/json');
     }
 
-    const response = await fetch(url, {
-        ...options,
-        headers
-    });
+    let response;
+
+    try {
+        response = await fetch(url, {
+            ...options,
+            headers
+        });
+    } catch (error) {
+        throw new ApiError('API request could not reach the server.', {
+            code: 'NETWORK_ERROR',
+            url,
+            cause: error
+        });
+    }
 
     const contentType = response.headers.get('content-type') || '';
     const rawText = await response.text();
