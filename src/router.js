@@ -10,6 +10,8 @@ import PrivacyView from './views/Privacy.js';
 import RefundPolicyView from './views/RefundPolicy.js';
 import TermsView from './views/Terms.js';
 import AccessibilityView from './views/Accessibility.js';
+import PaymentSuccessView from './views/PaymentSuccess.js';
+import PaymentFailView from './views/PaymentFail.js';
 
 const routes = {
     '/': HomeView,
@@ -25,7 +27,9 @@ const routes = {
     '/privacy': PrivacyView,
     '/refund-policy': RefundPolicyView,
     '/terms': TermsView,
-    '/accessibility': AccessibilityView
+    '/accessibility': AccessibilityView,
+    '/payments/success': PaymentSuccessView,
+    '/payments/fail': PaymentFailView
 };
 
 class Router {
