@@ -7,8 +7,8 @@ class ApiError extends Error {
 }
 
 const staticHostApiBaseUrls = {
-    'wappraisalcompany.com': 'https://waccheckout20260414.loca.lt',
-    'www.wappraisalcompany.com': 'https://waccheckout20260414.loca.lt'
+    'wappraisalcompany.com': 'https://109986775c6b47.lhr.life',
+    'www.wappraisalcompany.com': 'https://109986775c6b47.lhr.life'
 };
 
 function trimTrailingSlash(value) {
