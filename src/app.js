@@ -1,6 +1,9 @@
 import router from './router.js';
 import { translations } from './i18n.js';
 
+translations.en.nav_desktop_appraisal = 'Valuation Quote Request';
+translations.kr.nav_desktop_appraisal = '감정평가 견적 요청';
+
 class App {
     constructor() {
         this.currentLang = localStorage.getItem('wac-lang') || 'en';
