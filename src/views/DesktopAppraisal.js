@@ -1,107 +1,94 @@
-import { checkoutProducts, checkoutUseCases, tossPublicConfig } from '../config/tossPayments.js';
-import { ApiError, requestJson } from '../lib/api.js';
-import { formatKrw, getGuestCustomerKey, loadTossPaymentsSdk } from '../lib/tossPayments.js';
-
-const product = checkoutProducts[0];
-
-function renderList(items) {
-    return items.map(item => `<li>${item}</li>`).join('');
-}
+const quoteEmail = 'one@wexcorporation.com';
 
 function getLocalizedText(enText, krText) {
     return window.appState?.currentLang === 'kr' ? krText : enText;
 }
 
-function getCheckoutApiErrorMessage(error) {
-    if (error instanceof ApiError && error.code === 'NETWORK_ERROR') {
-        return getLocalizedText(
-            'The checkout API is temporarily unreachable. Please try again in a moment.',
-            '결제 API 서버에 일시적으로 연결되지 않습니다. 잠시 후 다시 시도해 주세요.'
-        );
-    }
+function getFieldValue(id) {
+    return document.getElementById(id)?.value.trim() || '';
+}
 
-    if (error instanceof ApiError && error.code === 'NON_JSON_RESPONSE') {
-        return getLocalizedText(
-            'The checkout API returned HTML instead of JSON. Please verify that the payment server is running and the API URL is correct.',
-            '결제 API 대신 HTML 페이지가 응답했습니다. 결제 서버가 실행 중인지와 API 주소가 맞는지 확인해 주세요.'
-        );
-    }
+function getSelectText(id) {
+    const select = document.getElementById(id);
+    return select?.selectedOptions?.[0]?.textContent.trim() || '';
+}
 
-    if (error instanceof ApiError && error.code === 'INVALID_JSON') {
-        return getLocalizedText(
-            'The checkout API returned malformed JSON. Please try again after the server response format is fixed.',
-            '결제 API가 잘못된 JSON을 반환했습니다. 서버 응답 형식을 점검한 뒤 다시 시도해 주세요.'
-        );
-    }
+function buildMailtoUrl() {
+    const subject = '[W Appraisal Company] 감정평가 견적 요청';
+    const bodyLines = [
+        '감정평가 견적 요청이 접수되었습니다.',
+        '',
+        '이름: ' + getFieldValue('da_name'),
+        '이메일: ' + getFieldValue('da_email'),
+        '회사/소속: ' + getFieldValue('da_company'),
+        '연락처: ' + getFieldValue('da_phone'),
+        '',
+        '평가대상 부동산 주소: ' + getFieldValue('da_address'),
+        '물건 유형: ' + getSelectText('da_type'),
+        '예상 면적: ' + getFieldValue('da_area') + ' sqm',
+        '필요 기한: ' + getFieldValue('da_due_date'),
+        '이용 목적: ' + getSelectText('da_purpose'),
+        '',
+        '추가 내용:',
+        getFieldValue('da_context') || '(미입력)',
+        '',
+        '위 내용으로 감정평가 견적을 요청합니다.'
+    ];
 
-    return error?.message || getLocalizedText(
-        'Checkout failed before payment approval.',
-        '결제 승인 전 단계에서 오류가 발생했습니다.'
-    );
+    return 'mailto:' + quoteEmail
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(bodyLines.join('\n'));
 }
 
 export default class DesktopAppraisalView {
     constructor() {
-        this.title = 'W Appraisal Company | Desktop Appraisal Checkout';
-        this.paymentClient = null;
-        this.isSubmitting = false;
+        this.title = 'W Appraisal Company | Valuation Quote Request';
     }
 
     async render() {
         document.title = this.title;
-
-        const useCaseCards = checkoutUseCases.map((useCase, index) => `
-            <article class="checkout-case card">
-                <span class="checkout-case-index">0${index + 1}</span>
-                <h3 class="mb-2">
-                    <span class="en-only">${useCase.labelEn}</span>
-                    <span class="kr-only">${useCase.labelKr}</span>
-                </h3>
-                <p class="text-secondary en-only">${useCase.copyEn}</p>
-                <p class="text-secondary kr-only">${useCase.copyKr}</p>
-            </article>
-        `).join('');
 
         return `
             <div class="view-desktop-appraisal fade-in">
                 <section class="page-header section" style="padding-bottom: 3rem;">
                     <div class="container">
                         <div class="purchase-badge-wrap mb-3">
-                            <span class="purchase-badge en-only">Guest checkout available. No sign-up required.</span>
-                            <span class="purchase-badge kr-only">비회원 구매 가능. 회원가입 없이 바로 결제할 수 있습니다.</span>
+                            <span class="purchase-badge en-only">Quote request. No payment required.</span>
+                            <span class="purchase-badge kr-only">감정평가 견적 요청. 결제 없이 문의할 수 있습니다.</span>
                         </div>
                         <h1 class="mb-3">
-                            <span class="en-only">Desktop Appraisal Checkout</span>
-                            <span class="kr-only">탁상 감정평가 결제</span>
+                            <span class="en-only">Valuation Quote Request</span>
+                            <span class="kr-only">감정평가 견적 요청</span>
                         </h1>
                         <p class="text-secondary mb-4 checkout-subcopy en-only">
-                            Review the product, confirm the use case, enter the property details, and continue with TossPayments checkout.
+                            Share basic property and engagement details. The request opens as an email to one@wexcorporation.com so the team can review scope and respond with a quotation.
                         </p>
                         <p class="text-secondary mb-4 checkout-subcopy kr-only">
-                            상품 설명과 구매 케이스를 확인한 뒤 물건 정보를 입력하고 토스페이먼츠로 결제를 진행할 수 있습니다.
+                            기본 물건 정보와 의뢰 목적을 남겨주시면 one@wexcorporation.com으로 견적 요청 메일이 작성됩니다. 담당자가 범위와 일정을 검토한 뒤 견적을 안내드립니다.
                         </p>
                         <div class="hero-facts">
                             <div class="hero-fact card">
-                                <strong class="en-only">Checkout price</strong>
-                                <strong class="kr-only">결제 금액</strong>
-                                <span>KRW ${formatKrw(product.price)}</span>
+                                <strong class="en-only">Request type</strong>
+                                <strong class="kr-only">요청 유형</strong>
+                                <span class="en-only">Appraisal quotation</span>
+                                <span class="kr-only">감정평가 견적</span>
                             </div>
                             <div class="hero-fact card">
-                                <strong class="en-only">Delivery</strong>
-                                <strong class="kr-only">제공 일정</strong>
-                                <span class="en-only">${product.deliveryEn}</span>
-                                <span class="kr-only">${product.deliveryKr}</span>
+                                <strong class="en-only">Recipient</strong>
+                                <strong class="kr-only">수신 이메일</strong>
+                                <span>${quoteEmail}</span>
                             </div>
                             <div class="hero-fact card">
-                                <strong class="en-only">Buyer type</strong>
-                                <strong class="kr-only">구매 대상</strong>
-                                <span class="en-only">${product.audienceEn}</span>
-                                <span class="kr-only">${product.audienceKr}</span>
+                                <strong class="en-only">Payment</strong>
+                                <strong class="kr-only">결제</strong>
+                                <span class="en-only">Not required</span>
+                                <span class="kr-only">불필요</span>
                             </div>
                             <div class="hero-fact card">
-                                <strong class="en-only">Payment gateway</strong>
-                                <strong class="kr-only">결제 수단</strong>
-                                <span>TossPayments</span>
+                                <strong class="en-only">Next step</strong>
+                                <strong class="kr-only">다음 단계</strong>
+                                <span class="en-only">Scope review and quote</span>
+                                <span class="kr-only">범위 검토 및 견적 안내</span>
                             </div>
                         </div>
                     </div>
@@ -109,151 +96,101 @@ export default class DesktopAppraisalView {
 
                 <section class="section" style="padding-top: 0;">
                     <div class="container">
-                        <div class="checkout-highlight-grid mb-4">
-                            <div class="card featured-checkout-card">
-                                <span class="eyebrow mb-3">
-                                    <span class="en-only">Purchasable Product</span>
-                                    <span class="kr-only">실제 결제 상품</span>
-                                </span>
-                                <div class="featured-checkout-head">
-                                    <div>
-                                        <h2 class="mb-2">
-                                            <span class="en-only">${product.nameEn}</span>
-                                            <span class="kr-only">${product.nameKr}</span>
-                                        </h2>
-                                        <p class="text-secondary en-only">${product.shortDescriptionEn}</p>
-                                        <p class="text-secondary kr-only">${product.shortDescriptionKr}</p>
-                                    </div>
-                                    <div class="featured-checkout-price">
-                                        <span class="en-only">Single payment</span>
-                                        <span class="kr-only">단건 결제</span>
-                                        <strong>KRW ${formatKrw(product.price)}</strong>
-                                    </div>
-                                </div>
-                                <div class="featured-checkout-meta">
-                                    <div>
-                                        <span class="en-only">Merchant</span>
-                                        <span class="kr-only">상호명</span>
-                                        <strong>${tossPublicConfig.merchantName}</strong>
-                                    </div>
-                                    <div>
-                                        <span class="en-only">Report type</span>
-                                        <span class="kr-only">산출물 형태</span>
-                                        <strong class="en-only">${product.reportTypeEn}</strong>
-                                        <strong class="kr-only">${product.reportTypeKr}</strong>
-                                    </div>
-                                    <div>
-                                        <span class="en-only">Delivery</span>
-                                        <span class="kr-only">제공 일정</span>
-                                        <strong class="en-only">${product.deliveryEn}</strong>
-                                        <strong class="kr-only">${product.deliveryKr}</strong>
-                                    </div>
-                                </div>
-                                <div class="notice-links" style="margin-top: 1.5rem;">
-                                    <a href="#checkoutForm" class="btn btn-primary checkout-scroll-btn">
-                                        <span class="en-only">Proceed to Checkout</span>
-                                        <span class="kr-only">결제 진행하기</span>
-                                    </a>
-                                    <a href="/refund-policy" data-link class="btn btn-secondary">
-                                        <span class="en-only">View Refund Policy</span>
-                                        <span class="kr-only">환불정책 보기</span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="checkout-case-grid">
-                                ${useCaseCards}
-                            </div>
-                        </div>
-
                         <div class="desktop-layout">
                             <div class="desktop-content">
                                 <div class="card mb-4">
                                     <h3 class="mb-3">
-                                        <span class="en-only">Product description</span>
-                                        <span class="kr-only">상품 상세 설명</span>
+                                        <span class="en-only">What to include</span>
+                                        <span class="kr-only">견적 요청에 필요한 정보</span>
                                     </h3>
-                                    <p class="text-secondary en-only">${product.descriptionEn}</p>
-                                    <p class="text-secondary kr-only">${product.descriptionKr}</p>
+                                    <p class="text-secondary en-only">
+                                        A useful quotation starts with the property address, property type, approximate area, required timeline, intended use, and any reporting standards or lender/auditor requirements that should be considered.
+                                    </p>
+                                    <p class="text-secondary kr-only">
+                                        정확한 견적을 위해 평가대상 주소, 물건 유형, 대략적인 면적, 필요 기한, 이용 목적, 적용 기준이나 금융기관/감사 대응 필요 여부를 함께 알려주세요.
+                                    </p>
                                 </div>
 
                                 <div class="grid-2 mb-4">
                                     <div class="card">
                                         <h3 class="mb-3">
-                                            <span class="en-only">Included in the service</span>
-                                            <span class="kr-only">제공 범위</span>
+                                            <span class="en-only">Typical quote scope</span>
+                                            <span class="kr-only">주요 견적 범위</span>
                                         </h3>
-                                        <ul class="feature-list en-only">${renderList(product.scopeEn)}</ul>
-                                        <ul class="feature-list kr-only">${renderList(product.scopeKr)}</ul>
+                                        <ul class="feature-list en-only">
+                                            <li>Formal real estate appraisal or valuation advisory</li>
+                                            <li>Cross-border valuation support and bilingual documentation</li>
+                                            <li>Financial reporting, lending, transaction, or internal review use cases</li>
+                                            <li>Scope, timeline, deliverables, and fee estimate after review</li>
+                                        </ul>
+                                        <ul class="feature-list kr-only">
+                                            <li>정식 부동산 감정평가 또는 가치평가 자문</li>
+                                            <li>크로스보더 평가 지원 및 한/영 문서화</li>
+                                            <li>재무보고, 담보대출, 거래 검토, 내부 의사결정 목적</li>
+                                            <li>검토 후 범위, 일정, 산출물, 보수 견적 안내</li>
+                                        </ul>
                                     </div>
 
                                     <div class="card">
                                         <h3 class="mb-3">
-                                            <span class="en-only">Service limitations</span>
-                                            <span class="kr-only">제한 사항</span>
+                                            <span class="en-only">Before submission</span>
+                                            <span class="kr-only">제출 전 확인 사항</span>
                                         </h3>
-                                        <ul class="feature-list en-only">${renderList(product.limitationsEn)}</ul>
-                                        <ul class="feature-list kr-only">${renderList(product.limitationsKr)}</ul>
+                                        <ul class="feature-list en-only">
+                                            <li>This page does not process payment.</li>
+                                            <li>Submitting the form opens your email app with a prepared message.</li>
+                                            <li>Please send the email to complete the request.</li>
+                                            <li>You may attach documents directly in your email app.</li>
+                                        </ul>
+                                        <ul class="feature-list kr-only">
+                                            <li>이 페이지에서는 결제가 진행되지 않습니다.</li>
+                                            <li>견적 요청 버튼을 누르면 작성된 메일이 열립니다.</li>
+                                            <li>메일 앱에서 전송을 눌러야 요청이 완료됩니다.</li>
+                                            <li>관련 자료는 메일 앱에서 파일로 첨부할 수 있습니다.</li>
+                                        </ul>
                                     </div>
-                                </div>
-
-                                <div class="card">
-                                    <h3 class="mb-3">
-                                        <span class="en-only">Purchase notice</span>
-                                        <span class="kr-only">구매 안내</span>
-                                    </h3>
-                                    <ul class="feature-list en-only">
-                                        <li>The checkout is available without creating an account.</li>
-                                        <li>Property details submitted on this page are used to create the paid request.</li>
-                                        <li>The TossPayments approval step is completed after the payment window returns to the success page.</li>
-                                    </ul>
-                                    <ul class="feature-list kr-only">
-                                        <li>회원가입 없이 비회원으로 바로 결제할 수 있습니다.</li>
-                                        <li>이 페이지에서 입력한 물건 정보는 유료 의뢰 접수 정보로 함께 저장됩니다.</li>
-                                        <li>토스페이먼츠 결제창 이후 성공 페이지에서 승인 절차가 완료됩니다.</li>
-                                    </ul>
                                 </div>
                             </div>
 
                             <div class="desktop-order-column">
                                 <div class="card order-summary-card mb-4">
                                     <div class="order-summary-row">
-                                        <span class="en-only">Product</span>
-                                        <span class="kr-only">상품명</span>
-                                        <strong class="en-only">${product.nameEn}</strong>
-                                        <strong class="kr-only">${product.nameKr}</strong>
+                                        <span class="en-only">Request</span>
+                                        <span class="kr-only">요청 항목</span>
+                                        <strong class="en-only">Valuation Quote</strong>
+                                        <strong class="kr-only">감정평가 견적</strong>
                                     </div>
                                     <div class="order-summary-row">
-                                        <span class="en-only">Single payment amount</span>
-                                        <span class="kr-only">단건 결제 금액</span>
-                                        <strong>KRW ${formatKrw(product.price)}</strong>
+                                        <span class="en-only">Send to</span>
+                                        <span class="kr-only">수신처</span>
+                                        <strong>${quoteEmail}</strong>
                                     </div>
                                     <div class="order-summary-row">
-                                        <span class="en-only">Buyer type</span>
-                                        <span class="kr-only">구매 가능 대상</span>
-                                        <strong class="en-only">${product.audienceEn}</strong>
-                                        <strong class="kr-only">${product.audienceKr}</strong>
+                                        <span class="en-only">Fee</span>
+                                        <span class="kr-only">견적 요청 비용</span>
+                                        <strong class="en-only">No upfront payment</strong>
+                                        <strong class="kr-only">사전 결제 없음</strong>
                                     </div>
                                     <div class="order-summary-row">
-                                        <span class="en-only">Delivery method</span>
-                                        <span class="kr-only">제공 방식</span>
-                                        <strong class="en-only">${product.deliveryEn}</strong>
-                                        <strong class="kr-only">${product.deliveryKr}</strong>
+                                        <span class="en-only">Response</span>
+                                        <span class="kr-only">응답</span>
+                                        <strong class="en-only">After scope review</strong>
+                                        <strong class="kr-only">범위 검토 후 안내</strong>
                                     </div>
                                 </div>
 
-                                <div id="checkoutForm" class="card contact-form-card">
+                                <div id="quoteForm" class="card contact-form-card">
                                     <form id="desktopForm" class="contact-form">
-                                        <input type="hidden" id="productId" value="${product.id}">
                                         <h3 class="mb-4 text-primary">
                                             <span class="en-only">Property & Contact Information</span>
                                             <span class="kr-only">물건 및 연락처 정보</span>
                                         </h3>
 
                                         <div class="guest-checkout-note mb-4">
-                                            <strong class="en-only">Guest purchase</strong>
-                                            <strong class="kr-only">비회원 구매</strong>
-                                            <p class="text-secondary en-only">Enter the buyer and property information below, then continue with TossPayments checkout.</p>
-                                            <p class="text-secondary kr-only">아래에 구매자와 물건 정보를 입력한 후 토스페이먼츠 결제로 이어집니다.</p>
+                                            <strong class="en-only">Email quote request</strong>
+                                            <strong class="kr-only">이메일 견적 요청</strong>
+                                            <p class="text-secondary en-only">Fill in the fields below. Your email app will open with a prepared request addressed to one@wexcorporation.com.</p>
+                                            <p class="text-secondary kr-only">아래 정보를 입력하면 one@wexcorporation.com 앞으로 작성된 견적 요청 메일이 열립니다.</p>
                                         </div>
 
                                         <div class="form-group mb-3">
@@ -270,6 +207,9 @@ export default class DesktopAppraisalView {
                                                     <option value="commercial" data-i18n="da_commercial">Commercial</option>
                                                     <option value="land" data-i18n="da_land">Land</option>
                                                     <option value="industrial" data-i18n="da_industrial">Industrial</option>
+                                                    <option value="hotel">Hospitality / 숙박시설</option>
+                                                    <option value="logistics">Logistics / 물류시설</option>
+                                                    <option value="other">Other / 기타</option>
                                                 </select>
                                             </div>
                                             <div class="form-group">
@@ -289,73 +229,72 @@ export default class DesktopAppraisalView {
                                             </div>
                                         </div>
 
+                                        <div class="grid-2 mb-3">
+                                            <div class="form-group">
+                                                <label for="da_email" data-i18n="da_email">Email *</label>
+                                                <input type="email" id="da_email" required class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="da_phone">
+                                                    <span class="en-only">Phone</span>
+                                                    <span class="kr-only">연락처</span>
+                                                </label>
+                                                <input type="tel" id="da_phone" class="form-control">
+                                            </div>
+                                        </div>
+
                                         <div class="form-group mb-3">
-                                            <label for="da_email" data-i18n="da_email">Email *</label>
-                                            <input type="email" id="da_email" required class="form-control">
+                                            <label for="da_company">
+                                                <span class="en-only">Company / Organization</span>
+                                                <span class="kr-only">회사 / 소속</span>
+                                            </label>
+                                            <input type="text" id="da_company" class="form-control">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="da_purpose">
+                                                <span class="en-only">Purpose of valuation *</span>
+                                                <span class="kr-only">감정평가 목적 *</span>
+                                            </label>
+                                            <select id="da_purpose" required class="form-control">
+                                                <option value="" selected disabled>Select purpose... / 목적 선택...</option>
+                                                <option value="transaction">Transaction / 매매 또는 거래 검토</option>
+                                                <option value="lending">Lending / 담보대출</option>
+                                                <option value="financial-reporting">Financial reporting / 재무보고</option>
+                                                <option value="investment-review">Investment review / 투자 검토</option>
+                                                <option value="dispute">Dispute or review / 분쟁 또는 검토</option>
+                                                <option value="other">Other / 기타</option>
+                                            </select>
                                         </div>
 
                                         <div class="form-group mb-4">
-                                            <label for="da_purpose">
-                                                <span class="en-only">Use of report *</span>
-                                                <span class="kr-only">이용 목적 *</span>
+                                            <label for="da_context">
+                                                <span class="en-only">Additional details</span>
+                                                <span class="kr-only">추가 내용</span>
                                             </label>
-                                            <select id="da_purpose" required class="form-control">
-                                                <option value="" selected disabled>Owner reference / 소유자 참고용 등 선택</option>
-                                                <option value="owner">Owner reference / 소유자 참고용</option>
-                                                <option value="buyer">Buyer screening / 매수 검토용</option>
-                                                <option value="internal">Internal business review / 내부 검토용</option>
-                                            </select>
+                                            <textarea id="da_context" rows="4" class="form-control" placeholder="Standards, preferred timeline, documents available, or special assumptions"></textarea>
                                         </div>
 
                                         <div class="agreement-box mb-4">
                                             <label class="agreement-item">
-                                                <input id="agreeRefund" type="checkbox" required>
-                                                <span class="en-only">I reviewed the <a href="/refund-policy" data-link class="text-accent">refund policy</a> and understand the refund conditions.</span>
-                                                <span class="kr-only"><a href="/refund-policy" data-link class="text-accent">환불정책</a>을 확인했고 환불 조건을 이해했습니다.</span>
+                                                <input id="agreeEmail" type="checkbox" required>
+                                                <span class="en-only">I understand this request will open my email app and must be sent from there.</span>
+                                                <span class="kr-only">메일 앱이 열리며, 요청 완료를 위해 메일 앱에서 직접 전송해야 함을 이해했습니다.</span>
                                             </label>
                                             <label class="agreement-item">
-                                                <input id="agreeService" type="checkbox" required>
-                                                <span class="en-only">I understand this is a paid digital service for one property and that no membership is required to purchase.</span>
-                                                <span class="kr-only">본 상품이 단일 부동산 1건에 대한 유료 디지털 서비스이며, 회원가입 없이 구매 가능함을 확인했습니다.</span>
+                                                <input id="agreePrivacy" type="checkbox" required>
+                                                <span class="en-only">I agree that the submitted information may be used to review the appraisal quote request.</span>
+                                                <span class="kr-only">입력한 정보가 감정평가 견적 검토를 위해 사용될 수 있음에 동의합니다.</span>
                                             </label>
                                         </div>
 
-                                        <div class="form-group mb-4 p-4 price-box">
-                                            <div class="price-box-header">
-                                                <div class="price-box-copy">
-                                                    <h4 class="mb-2" data-i18n="da_payment_title">Payment Required</h4>
-                                                    <p class="text-secondary mb-0" data-i18n="da_payment_desc">
-                                                        The one-time desktop appraisal fee is KRW 1,000, with delivery by email within 48 hours.
-                                                    </p>
-                                                </div>
-                                                <div class="price-box-amount">KRW ${formatKrw(product.price)}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="payment-widget-shell mb-4">
-                                            <div class="payment-widget-head mb-3">
-                                                <strong class="en-only">Supported payment window</strong>
-                                                <strong class="kr-only">지원 결제창</strong>
-                                                <p class="text-secondary en-only">After you submit, TossPayments opens a hosted checkout window for card and easy-pay methods.</p>
-                                                <p class="text-secondary kr-only">제출 버튼을 누르면 카드 및 간편결제를 지원하는 토스페이먼츠 호스티드 결제창이 열립니다.</p>
-                                            </div>
-                                            <div id="paymentMethodPanel" class="payment-widget-slot payment-window-panel">
-                                                <div class="payment-method-pill-row">
-                                                    <span class="payment-method-pill">CARD</span>
-                                                    <span class="payment-method-pill">Toss Pay</span>
-                                                    <span class="payment-method-pill">Naver Pay</span>
-                                                    <span class="payment-method-pill">Samsung Pay</span>
-                                                    <span class="payment-method-pill">Kakao Pay</span>
-                                                </div>
-                                                <p class="text-secondary mb-0 en-only">Availability depends on the buyer environment and the methods supported by TossPayments in the hosted card window.</p>
-                                                <p class="text-secondary mb-0 kr-only">실제 노출 방식은 구매자 환경과 토스페이먼츠 호스티드 카드 결제창의 지원 범위에 따라 달라집니다.</p>
-                                            </div>
-                                        </div>
-
-                                        <div id="checkoutStatus" class="checkout-status" aria-live="polite"></div>
+                                        <div id="quoteStatus" class="checkout-status" aria-live="polite"></div>
 
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary submit-btn" data-i18n="da_btn_pay">Pay KRW 1,000 and Submit</button>
+                                            <button type="submit" class="btn btn-primary submit-btn">
+                                                <span class="en-only">Prepare Quote Request Email</span>
+                                                <span class="kr-only">견적 요청 메일 작성하기</span>
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -375,81 +314,9 @@ export default class DesktopAppraisalView {
                     max-width: 840px;
                     font-size: 1.08rem;
                 }
-                .checkout-highlight-grid {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-                    gap: 1.4rem;
-                    align-items: stretch;
-                }
-                .featured-checkout-card {
-                    background:
-                        linear-gradient(180deg, rgba(186, 162, 255, 0.18), rgba(31, 41, 55, 0.92)),
-                        rgba(15, 23, 42, 0.9);
-                }
-                .featured-checkout-head {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1fr) auto;
-                    gap: 1rem;
-                    align-items: start;
-                }
-                .featured-checkout-price {
-                    min-width: 160px;
-                    padding: 1rem 1.15rem;
-                    border-radius: 20px;
-                    background: rgba(15, 23, 42, 0.55);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    display: grid;
-                    gap: 0.35rem;
-                }
-                .featured-checkout-price span,
-                .featured-checkout-meta span {
-                    font-size: 0.82rem;
-                    color: var(--text-secondary);
-                    text-transform: uppercase;
-                    letter-spacing: 0.08em;
-                }
-                .featured-checkout-price strong {
-                    font-size: 1.55rem;
-                }
-                .featured-checkout-meta {
-                    margin-top: 1.5rem;
-                    display: grid;
-                    grid-template-columns: repeat(3, minmax(0, 1fr));
-                    gap: 0.9rem;
-                }
-                .featured-checkout-meta div {
-                    padding: 1rem;
-                    border-radius: 18px;
-                    border: 1px solid rgba(255, 255, 255, 0.07);
-                    background: rgba(255, 255, 255, 0.03);
-                    display: grid;
-                    gap: 0.35rem;
-                }
-                .checkout-case-grid {
-                    display: grid;
-                    gap: 1rem;
-                }
-                .checkout-case {
-                    padding: 1.35rem;
-                    position: relative;
-                    min-height: 168px;
-                }
-                .checkout-case-index {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 38px;
-                    height: 38px;
-                    border-radius: 999px;
-                    background: rgba(186, 162, 255, 0.12);
-                    color: var(--accent);
-                    font-size: 0.86rem;
-                    font-weight: 700;
-                    margin-bottom: 1rem;
-                }
                 .desktop-layout {
                     display: grid;
-                    grid-template-columns: minmax(0, 1.28fr) minmax(360px, 0.84fr);
+                    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
                     gap: 2rem;
                     align-items: start;
                 }
@@ -492,6 +359,7 @@ export default class DesktopAppraisalView {
                 .hero-fact span {
                     font-size: 1.02rem;
                     line-height: 1.45;
+                    overflow-wrap: anywhere;
                 }
                 .feature-list {
                     padding-left: 0;
@@ -507,11 +375,6 @@ export default class DesktopAppraisalView {
                     color: var(--accent);
                     position: absolute;
                     left: 0;
-                }
-                .notice-links {
-                    display: flex;
-                    gap: 0.75rem;
-                    flex-wrap: wrap;
                 }
                 .order-summary-card {
                     background: linear-gradient(180deg, rgba(34, 211, 238, 0.08), rgba(31, 41, 55, 0.95));
@@ -532,6 +395,9 @@ export default class DesktopAppraisalView {
                 .order-summary-row span {
                     font-size: 0.85rem;
                     color: var(--text-secondary);
+                }
+                .order-summary-row strong {
+                    overflow-wrap: anywhere;
                 }
                 .guest-checkout-note {
                     border: 1px solid var(--border-color);
@@ -563,6 +429,11 @@ export default class DesktopAppraisalView {
                     font-size: 1rem;
                     transition: border-color var(--transition-normal);
                 }
+                textarea.form-control {
+                    border-radius: 20px;
+                    resize: vertical;
+                    min-height: 128px;
+                }
                 .form-control:focus {
                     outline: none;
                     border-color: var(--accent);
@@ -593,71 +464,6 @@ export default class DesktopAppraisalView {
                 .agreement-item input {
                     margin-top: 0.25rem;
                 }
-                .price-box {
-                    background: rgba(186, 162, 255, 0.08);
-                    border-radius: 12px;
-                    border: 1px solid var(--border-color);
-                    padding: 1.25rem 1.35rem;
-                }
-                .price-box-header {
-                    display: grid;
-                    grid-template-columns: minmax(0, 1fr) auto;
-                    gap: 1.15rem;
-                    align-items: start;
-                }
-                .price-box-copy {
-                    display: grid;
-                    gap: 0.2rem;
-                }
-                .price-box-copy p {
-                    line-height: 1.7;
-                }
-                .price-box-amount {
-                    font-size: 1.6rem;
-                    font-weight: 800;
-                    color: var(--accent);
-                    white-space: nowrap;
-                    padding: 0.95rem 1rem;
-                    border-radius: 18px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    align-self: center;
-                }
-                .payment-widget-shell {
-                    border: 1px solid var(--border-color);
-                    border-radius: 18px;
-                    padding: 1rem;
-                    background: rgba(255, 255, 255, 0.03);
-                }
-                .payment-widget-head p {
-                    margin-bottom: 0;
-                }
-                .payment-widget-slot {
-                    border-radius: 18px;
-                    background: rgba(255, 255, 255, 0.02);
-                }
-                .payment-window-panel {
-                    padding: 1.15rem;
-                    display: grid;
-                    gap: 1rem;
-                }
-                .payment-method-pill-row {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 0.6rem;
-                }
-                .payment-method-pill {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 0.55rem 0.85rem;
-                    border-radius: 999px;
-                    border: 1px solid rgba(186, 162, 255, 0.2);
-                    background: rgba(186, 162, 255, 0.08);
-                    color: var(--text-primary);
-                    font-size: 0.88rem;
-                    font-weight: 600;
-                }
                 .checkout-status {
                     display: none;
                     margin-bottom: 1rem;
@@ -669,11 +475,6 @@ export default class DesktopAppraisalView {
                 .checkout-status.is-visible {
                     display: block;
                 }
-                .checkout-status.is-error {
-                    background: rgba(239, 68, 68, 0.12);
-                    border: 1px solid rgba(239, 68, 68, 0.28);
-                    color: #fecaca;
-                }
                 .checkout-status.is-success {
                     background: rgba(34, 197, 94, 0.12);
                     border: 1px solid rgba(34, 197, 94, 0.28);
@@ -684,25 +485,16 @@ export default class DesktopAppraisalView {
                     font-size: 1.05rem;
                     padding: 14px 24px;
                 }
-                .checkout-scroll-btn {
-                    scroll-behavior: smooth;
-                }
                 @media (max-width: 1180px) {
-                    .checkout-highlight-grid,
                     .desktop-layout {
                         grid-template-columns: 1fr;
                     }
                     .desktop-order-column {
                         position: static;
                     }
-                    .checkout-case-grid {
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
-                    }
                 }
                 @media (max-width: 980px) {
-                    .hero-facts,
-                    .featured-checkout-meta,
-                    .checkout-case-grid {
+                    .hero-facts {
                         grid-template-columns: 1fr 1fr;
                     }
                 }
@@ -716,35 +508,15 @@ export default class DesktopAppraisalView {
                         text-align: center;
                         line-height: 1.45;
                     }
-                    .hero-facts,
-                    .featured-checkout-meta,
-                    .checkout-case-grid {
+                    .hero-facts {
                         grid-template-columns: 1fr;
-                    }
-                    .featured-checkout-head,
-                    .price-box-header {
-                        grid-template-columns: 1fr;
-                    }
-                    .featured-checkout-price {
-                        min-width: 0;
-                    }
-                    .notice-links,
-                    .notice-links .btn {
-                        width: 100%;
-                    }
-                    .notice-links {
-                        flex-direction: column;
                     }
                     .order-summary-card,
-                    .contact-form-card,
-                    .featured-checkout-card,
-                    .checkout-case {
+                    .contact-form-card {
                         border-radius: 24px;
                     }
                     .guest-checkout-note,
-                    .agreement-box,
-                    .price-box,
-                    .payment-widget-shell {
+                    .agreement-box {
                         border-radius: 18px;
                     }
                     .agreement-item {
@@ -764,9 +536,6 @@ export default class DesktopAppraisalView {
                     .text-center .btn {
                         width: 100%;
                     }
-                    .price-box-amount {
-                        font-size: 1.4rem;
-                    }
                 }
                 @media (max-width: 560px) {
                     .checkout-subcopy,
@@ -784,8 +553,6 @@ export default class DesktopAppraisalView {
                     .form-group label {
                         font-size: 0.86rem;
                     }
-                    .featured-checkout-card,
-                    .checkout-case,
                     .order-summary-card,
                     .contact-form-card {
                         padding: 1.2rem;
@@ -795,127 +562,28 @@ export default class DesktopAppraisalView {
         `;
     }
 
-    async attachEvents() {
+    attachEvents() {
         const form = document.getElementById('desktopForm');
-        const submitButton = form?.querySelector('button[type="submit"]');
-        const statusEl = document.getElementById('checkoutStatus');
-        const checkoutAnchor = document.querySelector('.checkout-scroll-btn');
+        const statusEl = document.getElementById('quoteStatus');
 
-        if (checkoutAnchor) {
-            checkoutAnchor.addEventListener('click', event => {
-                event.preventDefault();
-                document.getElementById('checkoutForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        }
-
-        if (!form || !submitButton || !statusEl) {
+        if (!form || !statusEl) {
             return;
         }
 
-        const setStatus = (type, message) => {
-            statusEl.className = 'checkout-status';
-            statusEl.textContent = '';
-
-            if (!message) {
-                return;
-            }
-
-            statusEl.classList.add('is-visible', type === 'error' ? 'is-error' : 'is-success');
-            statusEl.textContent = message;
-        };
-
-        const setSubmitting = isSubmitting => {
-            this.isSubmitting = isSubmitting;
-            submitButton.disabled = isSubmitting;
-            submitButton.textContent = isSubmitting
-                ? getLocalizedText('Preparing secure payment...', '안전한 결제를 준비하고 있습니다...')
-                : getLocalizedText('Pay KRW 1,000 and Submit', '1,000원 결제 및 요청 제출');
-        };
-
-        try {
-            await loadTossPaymentsSdk();
-            const tossPayments = window.TossPayments(tossPublicConfig.clientKey);
-            this.paymentClient = tossPayments.payment({
-                customerKey: getGuestCustomerKey()
-            });
-        } catch (error) {
-            setStatus('error', getLocalizedText(
-                'TossPayments checkout failed to initialize. Refresh the page and try again.',
-                '토스페이먼츠 결제창을 초기화하지 못했습니다. 새로고침 후 다시 시도해 주세요.'
-            ));
-            console.error(error);
-        }
-
-        form.addEventListener('submit', async event => {
+        form.addEventListener('submit', event => {
             event.preventDefault();
-
-            if (this.isSubmitting) {
-                return;
-            }
-
-            if (!this.paymentClient) {
-                setStatus('error', getLocalizedText(
-                    'The payment window is not ready yet. Please wait a moment and try again.',
-                    '결제창이 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.'
-                ));
-                return;
-            }
 
             if (!form.reportValidity()) {
                 return;
             }
 
-            setSubmitting(true);
-            setStatus('', '');
+            statusEl.className = 'checkout-status is-visible is-success';
+            statusEl.textContent = getLocalizedText(
+                'Your email app is opening with the quote request. Please send the email to complete the request.',
+                '견적 요청 메일이 열립니다. 메일 앱에서 전송을 눌러야 요청이 완료됩니다.'
+            );
 
-            const payload = {
-                productId: document.getElementById('productId')?.value,
-                propertyAddress: document.getElementById('da_address')?.value.trim(),
-                propertyType: document.getElementById('da_type')?.value,
-                area: Number(document.getElementById('da_area')?.value),
-                dueDate: document.getElementById('da_due_date')?.value,
-                customerName: document.getElementById('da_name')?.value.trim(),
-                customerEmail: document.getElementById('da_email')?.value.trim(),
-                reportUse: document.getElementById('da_purpose')?.value
-            };
-
-            try {
-                const order = await requestJson('/api/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                sessionStorage.setItem('wac-last-order', JSON.stringify({
-                    orderId: order.orderId,
-                    productId: payload.productId,
-                    customerEmail: payload.customerEmail
-                }));
-
-                await this.paymentClient.requestPayment({
-                    method: 'CARD',
-                    amount: {
-                        currency: product.currency,
-                        value: product.price
-                    },
-                    orderId: order.orderId,
-                    orderName: order.orderName,
-                    successUrl: order.successUrl,
-                    failUrl: order.failUrl,
-                    customerEmail: order.customerEmail,
-                    customerName: order.customerName,
-                    windowTarget: window.innerWidth <= 768 ? 'self' : 'iframe',
-                    card: {
-                        flowMode: 'DEFAULT'
-                    }
-                });
-            } catch (error) {
-                setSubmitting(false);
-                setStatus('error', getCheckoutApiErrorMessage(error));
-                console.error(error);
-            }
+            window.location.href = buildMailtoUrl();
         });
     }
 }
